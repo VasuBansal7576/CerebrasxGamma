@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="QuoteSquad quote audit report.">
+    <title>QuoteSquad Audit</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">QuoteSquad</a>
+      <nav aria-label="Report actions">
+        <a href="/analyses/{{ analysis.id }}/report.pdf">Download PDF</a>
+      </nav>
+    </header>
+    <main class="shell report-shell">
+      <section class="report-hero">
+        <div>
+          <p class="overline">{{ analysis.status.value }}</p>
+          <h1>{{ analysis.synthesis.verdict }}</h1>
+          <p class="lead">{{ analysis.synthesis.summary }}</p>
+        </div>
+        <div class="score-panel">
+          <span>Potential savings</span>
+          <strong>${{ analysis.synthesis.savings_low.amount }}-${{ analysis.synthesis.savings_high.amount }}</strong>
+          <small>{{ analysis.findings | length }} finding{{ "" if analysis.findings | length == 1 else "s" }}</small>
+        </div>
+      </section>
+
+      {% if analysis.gaps %}
+        <section class="notice-panel">
+          <h2>Explicit gaps</h2>
+          <div class="gap-list">
+            {% for gap in analysis.gaps %}
+              <p><strong>{{ gap.provider }}</strong>: {{ gap.reason }} Blocks: {{ gap.blocks }}.</p>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+      <section class="evidence-grid" aria-label="Findings">
+        {% for finding in analysis.findings %}
+          <article class="finding finding-{{ finding.status.value }}">
+            <div class="finding-topline">
+              <span>{{ finding.status.value }}</span>
+              <strong>{{ "%.0f%%" | format(finding.confidence * 100) }}</strong>
+            </div>
+            <h2>{{ finding.title }}</h2>
+            <p>{{ finding.finding }}</p>
+            <dl>
+              {% if finding.quoted %}
+                <div><dt>Quoted</dt><dd>${{ finding.quoted.amount }}</dd></div>
+              {% endif %}
+              {% if finding.benchmark %}
+                <div><dt>Benchmark</dt><dd>${{ finding.benchmark.amount }}</dd></div>
+              {% endif %}
+              {% if finding.delta %}
+                <div><dt>Delta</dt><dd>${{ finding.delta.amount }}</dd></div>
+              {% endif %}
+            </dl>
+            {% if finding.citations %}
+              <div class="citations">
+                {% for citation in finding.citations %}
+                  <a href="{{ citation.url }}">{{ citation.title }}</a>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="muted">No citation met the source threshold for this finding.</p>
+            {% endif %}
+          </article>
+        {% else %}
+          <article class="empty-panel">
+            <h2>No challenge-ready findings</h2>
+            <p>The system needs better line items, ZIP context, or configured providers before making a savings claim.</p>
+          </article>
+        {% endfor %}
+      </section>
+
+      <section class="actions-grid">
+        <article>
+          <h2>Challenge script</h2>
+          <p>{{ analysis.actions.challenge_script }}</p>
+        </article>
+        <article>
+          <h2>Email</h2>
+          <pre>{{ analysis.actions.email_template }}</pre>
+        </article>
+        <article>
+          <h2>Text</h2>
+          <p>{{ analysis.actions.text_template }}</p>
+        </article>
+        {% if analysis.actions.complaint_note %}
+          <article>
+            <h2>Escalation note</h2>
+            <p>{{ analysis.actions.complaint_note }}</p>
+          </article>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>

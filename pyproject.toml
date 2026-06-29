@@ -1,0 +1,104 @@
+[project]
+name = "quotesquad"
+version = "0.1.0"
+description = "Production core for QuoteSquad, a citation-grounded quote intelligence platform."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiosqlite>=0.21.0",
+    "anyio>=4.11.0",
+    "asyncpg>=0.30.0",
+    "fastapi>=0.118.0",
+    "httpx2[http2,brotli,zstd]>=0.28.0",
+    "jinja2>=3.1.6",
+    "orjson>=3.11.0",
+    "pydantic[email]>=2.11.0",
+    "pydantic-settings>=2.10.0",
+    "pypdf>=6.0.0",
+    "python-multipart>=0.0.20",
+    "reportlab>=4.4.0",
+    "sqlalchemy[asyncio]>=2.0.40",
+    "uvicorn[standard]>=0.37.0",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.31.0",
+    "pytest>=8.4.0",
+    "ruff>=0.13.0",
+]
+
+[tool.basedpyright]
+typeCheckingMode = "all"
+pythonVersion = "3.13"
+pythonPlatform = "All"
+include = ["src", "tests"]
+exclude = ["**/__pycache__", "**/.venv", "**/build", "**/dist"]
+reportUnusedCallResult = "warning"
+reportUnnecessaryTypeIgnoreComment = "error"
+reportUnusedVariable = "error"
+reportMissingParameterType = "error"
+reportPrivateUsage = "error"
+reportUnannotatedClassAttribute = "none"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "COM812",
+    "CPY001",
+    "D",
+    "D203",
+    "D213",
+    "E501",
+    "EM101",
+    "FBT001",
+    "FBT002",
+    "FLY002",
+    "FIX002",
+    "FURB157",
+    "FURB167",
+    "ISC001",
+    "PERF401",
+    "PLC0415",
+    "PLR0913",
+    "PLR2004",
+    "PLW0603",
+    "TC001",
+    "TC002",
+    "TC003",
+    "TD002",
+    "TD003",
+    "TRY003",
+]
+fixable = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["ARG", "D", "PLR2004", "S101"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.File",
+    "fastapi.Form",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = ["-ra", "--strict-config", "--strict-markers"]
+filterwarnings = ["error"]

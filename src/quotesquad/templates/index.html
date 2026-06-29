@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="QuoteSquad audits professional quotes with citations and confidence gates.">
+    <title>QuoteSquad</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script defer src="/static/app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">QuoteSquad</a>
+      <nav aria-label="Primary">
+        <a href="/enterprise">Enterprise</a>
+        <a href="/api/health">API health</a>
+      </nav>
+    </header>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="overline">Citation-grounded quote audits</p>
+          <h1>Know what to challenge before you approve the quote.</h1>
+          <p class="lead">Paste an estimate and get sourced findings, confidence gates, and negotiation artifacts.</p>
+        </div>
+        <form class="upload-panel" action="/analyze" method="post" enctype="multipart/form-data">
+          {% if error %}
+            <p class="error" role="alert">{{ error }}</p>
+          {% endif %}
+          <label for="quote_text">Quote text</label>
+          <textarea id="quote_text" name="quote_text" rows="12" placeholder="Paste line items, totals, vendor name, and ZIP context"></textarea>
+          <div class="field-grid">
+            <div>
+              <label for="zip_code">ZIP code</label>
+              <input id="zip_code" name="zip_code" inputmode="numeric" autocomplete="postal-code" placeholder="90210">
+            </div>
+            <div>
+              <label for="upload">Upload PDF or text</label>
+              <input id="upload" name="upload" type="file" accept=".pdf,.txt,.csv,.md,.jpg,.jpeg,.png,.heic,.webp">
+            </div>
+          </div>
+          <label class="check-row" for="consent_to_learn">
+            <input id="consent_to_learn" name="consent_to_learn" type="checkbox" value="true">
+            <span>Use anonymized pricing signals to improve regional benchmarks</span>
+          </label>
+          <div class="form-actions">
+            <button type="button" class="secondary" data-sample>Load sample</button>
+            <button type="submit" class="primary" data-submit>Audit quote</button>
+          </div>
+        </form>
+      </section>
+      <section class="trust-strip" aria-label="Trust rules">
+        <div>
+          <strong>No raw document storage</strong>
+          <span>PII is scrubbed before extraction.</span>
+        </div>
+        <div>
+          <strong>Confidence gates</strong>
+          <span>Low-confidence claims stay out of the script.</span>
+        </div>
+        <div>
+          <strong>Citation trail</strong>
+          <span>Every finding shows its source or its gap.</span>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

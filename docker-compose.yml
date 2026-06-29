@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      QUOTESQUAD_APP_ENV: prod
+      QUOTESQUAD_DATABASE_URL: sqlite+aiosqlite:////app/data/quotesquad.db
+      QUOTESQUAD_PUBLIC_BASE_URL: http://localhost:8000
+    volumes:
+      - quotesquad-data:/app/data
+  postgres:
+    image: postgres:16-alpine
+    profiles:
+      - infra
+    environment:
+      POSTGRES_DB: quotesquad
+      POSTGRES_USER: quotesquad
+      POSTGRES_PASSWORD: quotesquad
+    ports:
+      - "5432:5432"
+    volumes:
+      - quotesquad-postgres:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
+    profiles:
+      - infra
+    ports:
+      - "6379:6379"
+
+volumes:
+  quotesquad-data:
+  quotesquad-postgres:

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="QuoteSquad enterprise intelligence view.">
+    <title>QuoteSquad Enterprise</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">QuoteSquad</a>
+      <nav aria-label="Enterprise actions">
+        <a href="/api/enterprise/fleet/summary">Fleet API</a>
+      </nav>
+    </header>
+    <main class="shell report-shell">
+      <section class="report-hero">
+        <div>
+          <p class="overline">Enterprise intelligence</p>
+          <h1>Fleet and vendor risk, built from sourced audits.</h1>
+          <p class="lead">Use this page to verify phase 3 and phase 4 surfaces without external credentials.</p>
+        </div>
+        <div class="score-panel">
+          <span>Tracked vendors</span>
+          <strong>{{ vendors | length }}</strong>
+          <small>{{ calibration_rows | length }} calibrated categories</small>
+        </div>
+      </section>
+
+      <section class="actions-grid">
+        <article>
+          <h2>Vendor intelligence</h2>
+          {% for vendor in vendors %}
+            <p><strong>{{ vendor.vendor }}</strong>: {{ vendor.flagged_findings }} flags across {{ vendor.analyses }} audit{{ "" if vendor.analyses == 1 else "s" }}. Repeat flag: {{ "yes" if vendor.repeat_flag else "no" }}.</p>
+          {% else %}
+            <p>No vendor history yet. Submit consented analyses to build the moat.</p>
+          {% endfor %}
+        </article>
+        <article>
+          <h2>Outcome calibration</h2>
+          {% for row in calibration_rows %}
+            <p><strong>{{ row.category }}</strong>: {{ "%.0f%%" | format(row.success_rate * 100) }} success over {{ row.sample_size }} outcomes.</p>
+          {% else %}
+            <p>No feedback outcomes yet. Post feedback to calibrate confidence.</p>
+          {% endfor %}
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
