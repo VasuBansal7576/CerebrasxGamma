@@ -17,6 +17,7 @@ Production core for the architecture in `Architecture.md`: upload or paste a quo
 - Optional local Tesseract OCR for image uploads, with explicit gaps when unavailable.
 - No-key NHTSA recall and complaint context for detected vehicle quotes.
 - Best-effort eBay public-web parts price checks, with explicit gaps when blocked.
+- No-key OpenStreetMap alternative-vendor candidates from Zippopotam, Overpass, and bounded Nominatim search, labeled as public directory data.
 - Multi-agent audit pipeline: labor, parts, contractor, necessity, alternatives.
 - Verification gate with confidence bands and conflict notes.
 - Cerebras synthesis boundary, disabled until `QUOTESQUAD_CEREBRAS_API_KEY` is set.
@@ -30,6 +31,7 @@ Production core for the architecture in `Architecture.md`: upload or paste a quo
 
 - Mitchell, Chilton, RSMeans, Home Depot, Yelp, and BBB are readiness placeholders until real credentials or a legal public-data path exists.
 - eBay public-web pricing is best-effort and reports a gap when blocked.
+- OpenStreetMap alternatives are call targets, not licensing/rating/open-hours verification.
 - Cloud services, SOC 2, HIPAA, mobile, and browser extension work are not represented as complete unless provisioned separately.
 
 ## Run locally
@@ -88,6 +90,8 @@ Add Cerebras after the build:
 QUOTESQUAD_CEREBRAS_API_KEY=...
 QUOTESQUAD_CEREBRAS_MODEL=gemma-4-31b
 QUOTESQUAD_NHTSA_BASE_URL=https://api.nhtsa.gov
+QUOTESQUAD_ZIPPOPOTAM_BASE_URL=https://api.zippopotam.us
+QUOTESQUAD_OVERPASS_BASE_URL=https://overpass-api.de/api
 QUOTESQUAD_MITCHELL_API_KEY=...
 QUOTESQUAD_CHILTON_API_KEY=...
 QUOTESQUAD_EBAY_API_KEY=...

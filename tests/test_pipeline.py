@@ -10,6 +10,7 @@ from pydantic import TypeAdapter
 
 from quotesquad.config import get_settings
 from quotesquad.document import extract_quote
+from quotesquad.local_vendors import alternative_vendor_result
 from quotesquad.market_web import parse_ebay_prices
 from quotesquad.ocr import extract_image_text
 from quotesquad.pii import scrub_pii
@@ -17,6 +18,7 @@ from quotesquad.public_data import NhtsaData, NhtsaRecall, nhtsa_agent_result
 from quotesquad.readiness import InfraReadiness, ProviderReadiness
 from quotesquad.schemas import AnalysisRead, ComplianceControl, EnterpriseAuditRead
 from quotesquad.synthesis import SynthesisPayload
+from quotesquad.vendor_directory import NominatimPlace, OsmCandidate, nominatim_candidates
 
 SAMPLE_QUOTE = "\n".join(
     (
@@ -79,6 +81,8 @@ def test_extract_quote_when_vehicle_context_is_present() -> None:
     assert quote.vehicle_year == 2019
     assert quote.vehicle_make == "Toyota"
     assert quote.vehicle_model == "CAMRY"
+    assert len(quote.line_items) == 1
+    assert quote.line_items[0].description == "Fuel pump replacement"
 
 
 def test_image_ocr_reports_gap_when_tesseract_is_missing(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -122,6 +126,48 @@ def test_parse_ebay_prices_from_public_page_text() -> None:
     assert prices == (Decimal("89.99"), Decimal("12.00"), Decimal("120.00"))
 
 
+def test_alternative_vendor_result_uses_public_osm_candidate() -> None:
+    quote = extract_quote(SAMPLE_QUOTE, "90210")
+    result = alternative_vendor_result(
+        quote,
+        (
+            OsmCandidate(
+                name="Beverly Auto Care",
+                osm_url="https://www.openstreetmap.org/node/123",
+                phone="310-555-0142",
+                website=None,
+            ),
+        ),
+        "auto repair",
+    )
+    assert len(result.findings) == 1
+    finding = result.findings[0]
+    assert finding.agent == "alternative"
+    assert finding.status.value == "unverified"
+    assert "Beverly Auto Care" in finding.finding
+    assert finding.citations[0].source_type.value == "external"
+
+
+def test_nominatim_candidates_become_deduped_osm_targets() -> None:
+    candidates = nominatim_candidates(
+        (
+            NominatimPlace(
+                display_name="Complete Auto Repair, Los Angeles, California",
+                osm_type="way",
+                osm_id=425122676,
+            ),
+            NominatimPlace(
+                display_name="Complete Auto Repair, Los Angeles County",
+                osm_type="way",
+                osm_id=425122676,
+            ),
+        )
+    )
+    assert len(candidates) == 1
+    assert candidates[0].name == "Complete Auto Repair"
+    assert candidates[0].osm_url == "https://www.openstreetmap.org/way/425122676"
+
+
 def test_create_analysis_when_quote_is_posted(client: TestClient) -> None:
     response = client.post(
         "/api/analyses",
@@ -144,7 +190,7 @@ def test_provider_and_infra_readiness_surfaces(client: TestClient) -> None:
     infra_payload = InfraReadiness.model_validate_json(infra.text)
     provider_names = {item.name for item in provider_payload.providers}
     infra_names = {item.name for item in infra_payload.items}
-    assert {"cerebras", "mitchell", "tesseract_ocr"} <= provider_names
+    assert {"cerebras", "mitchell", "openstreetmap", "tesseract_ocr"} <= provider_names
     assert {"database", "redis", "temporal", "object_storage", "observability"} <= infra_names
 
 
@@ -156,6 +202,7 @@ def test_report_page_when_analysis_exists(client: TestClient) -> None:
     assert report.status_code == 200
     assert "QuoteSquad Audit" in report.text
     assert "Challenge script" in report.text
+    assert "Record the outcome" in report.text
 
 
 def test_feedback_calibrates_and_builds_regional_store(client: TestClient) -> None:
@@ -174,6 +221,23 @@ def test_feedback_calibrates_and_builds_regional_store(client: TestClient) -> No
     assert regional.status_code == 200
     assert calibration.status_code == 200
     assert regional.json()
+    assert calibration.json()
+
+
+def test_report_feedback_form_records_outcome(client: TestClient) -> None:
+    response = client.post(
+        "/api/analyses",
+        json={"quote_text": SAMPLE_QUOTE, "zip_code": "90210", "consent_to_learn": True},
+    )
+    analysis = AnalysisRead.model_validate_json(response.text)
+    feedback = client.post(
+        f"/analyses/{analysis.id}/feedback",
+        data={"outcome": "won_discount", "negotiated_savings": "125.50", "notes": "Vendor cut it."},
+        follow_redirects=False,
+    )
+    assert feedback.status_code == 303
+    calibration = client.get("/api/calibration")
+    assert calibration.status_code == 200
     assert calibration.json()
 
 

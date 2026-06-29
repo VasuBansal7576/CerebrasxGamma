@@ -1,0 +1,67 @@
+@media (max-width: 900px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
+
+  .shell {
+    padding: var(--space-8) var(--space-4) var(--space-12);
+  }
+
+  .workspace,
+  .report-summary,
+  .field-grid,
+  .ledger-grid,
+  .ops-strip,
+  .actions-grid,
+  .metric-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .brief-panel h1,
+  .report-summary h1 {
+    font-size: 36px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .line-item {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .brief-panel,
+  .intake-panel,
+  .quote-ledger,
+  .notice-panel,
+  .finding,
+  .actions-grid article,
+  .empty-panel,
+  .feedback-panel {
+    padding: var(--space-4);
+  }
+
+  .topbar nav {
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

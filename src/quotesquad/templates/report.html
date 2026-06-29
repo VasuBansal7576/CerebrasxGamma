@@ -6,49 +6,112 @@
     <meta name="description" content="QuoteSquad quote audit report.">
     <title>QuoteSquad Audit</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/forms.css">
+    <link rel="stylesheet" href="/static/report.css">
+    <link rel="stylesheet" href="/static/responsive.css">
+    <script defer src="/static/app.js"></script>
   </head>
   <body>
+    <a class="skip-link" href="#content">Skip to audit report</a>
     <header class="topbar">
-      <a class="brand" href="/">QuoteSquad</a>
+      <a class="brand" href="/" aria-label="QuoteSquad home">
+        <span class="brand-mark" aria-hidden="true">QS</span>
+        <span>QuoteSquad</span>
+      </a>
       <nav aria-label="Report actions">
         <a href="/analyses/{{ analysis.id }}/report.pdf">Download PDF</a>
       </nav>
     </header>
-    <main class="shell report-shell">
-      <section class="report-hero">
+    <main class="shell report-shell" id="content">
+      <section class="report-summary">
         <div>
-          <p class="overline">{{ analysis.status.value }}</p>
+          <p class="eyebrow">{{ analysis.status.value }} audit</p>
           <h1>{{ analysis.synthesis.verdict }}</h1>
           <p class="lead">{{ analysis.synthesis.summary }}</p>
         </div>
-        <div class="score-panel">
-          <span>Potential savings</span>
-          <strong>${{ analysis.synthesis.savings_low.amount }}-${{ analysis.synthesis.savings_high.amount }}</strong>
-          <small>{{ analysis.findings | length }} finding{{ "" if analysis.findings | length == 1 else "s" }}</small>
+        <div class="metric-panel" aria-label="Audit summary">
+          <div>
+            <span>Potential savings</span>
+            <strong>${{ analysis.synthesis.savings_low.amount }} - ${{ analysis.synthesis.savings_high.amount }}</strong>
+          </div>
+          <div>
+            <span>Findings</span>
+            <strong>{{ analysis.findings | length }}</strong>
+          </div>
+          <div>
+            <span>Gaps</span>
+            <strong>{{ analysis.gaps | length }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="quote-ledger" aria-label="Submitted quote">
+        <div class="panel-heading">
+          <p class="eyebrow">Submitted quote</p>
+          <h2>{{ analysis.quote.vendor or "Unknown vendor" }}</h2>
+        </div>
+        <div class="ledger-grid">
+          <div><span>Type</span><strong>{{ analysis.quote.quote_type.value }}</strong></div>
+          <div><span>ZIP</span><strong>{{ analysis.quote.zip_code or "missing" }}</strong></div>
+          <div><span>Total</span><strong>{% if analysis.quote.quote_total %}${{ analysis.quote.quote_total.amount }}{% else %}unknown{% endif %}</strong></div>
+        </div>
+        <div class="line-items">
+          {% for item in analysis.quote.line_items %}
+            <div class="line-item">
+              <span>{{ item.kind.value }}</span>
+              <strong>{{ item.description }}</strong>
+              <em>${{ item.total.amount }}</em>
+            </div>
+          {% endfor %}
         </div>
       </section>
 
       {% if analysis.gaps %}
-        <section class="notice-panel">
-          <h2>Explicit gaps</h2>
+        <section class="notice-panel" aria-label="Explicit gaps">
+          <div class="panel-heading">
+            <p class="eyebrow">Provider truth</p>
+            <h2>Explicit gaps</h2>
+          </div>
           <div class="gap-list">
             {% for gap in analysis.gaps %}
-              <p><strong>{{ gap.provider }}</strong>: {{ gap.reason }} Blocks: {{ gap.blocks }}.</p>
+              <article>
+                <strong>{{ gap.provider }}</strong>
+                <p>{{ gap.reason }}</p>
+                <small>Blocks: {{ gap.blocks }}</small>
+              </article>
             {% endfor %}
           </div>
         </section>
       {% endif %}
 
-      <section class="evidence-grid" aria-label="Findings">
+      {% if analysis.conflicts %}
+        <section class="notice-panel" aria-label="Conflicts">
+          <div class="panel-heading">
+            <p class="eyebrow">Cross-checks</p>
+            <h2>Conflicts to review</h2>
+          </div>
+          <div class="gap-list">
+            {% for conflict in analysis.conflicts %}
+              <article><p>{{ conflict }}</p></article>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+      <section class="evidence-list" aria-label="Findings">
+        <div class="panel-heading">
+          <p class="eyebrow">Evidence</p>
+          <h2>Findings</h2>
+        </div>
         {% for finding in analysis.findings %}
-          <article class="finding finding-{{ finding.status.value }}">
+          <article class="finding finding-{{ finding.status.value }}" data-agent="{{ finding.agent }}">
             <div class="finding-topline">
-              <span>{{ finding.status.value }}</span>
-              <strong>{{ "%.0f%%" | format(finding.confidence * 100) }}</strong>
+              <span>{{ finding.agent }} / {{ finding.status.value }}</span>
+              <strong>{{ "%.0f%% confidence" | format(finding.confidence * 100) }}</strong>
             </div>
             <h2>{{ finding.title }}</h2>
             <p>{{ finding.finding }}</p>
-            <dl>
+            <dl class="money-row">
               {% if finding.quoted %}
                 <div><dt>Quoted</dt><dd>${{ finding.quoted.amount }}</dd></div>
               {% endif %}
@@ -77,7 +140,7 @@
         {% endfor %}
       </section>
 
-      <section class="actions-grid">
+      <section class="actions-grid" aria-label="Negotiation artifacts">
         <article>
           <h2>Challenge script</h2>
           <p>{{ analysis.actions.challenge_script }}</p>
@@ -96,6 +159,33 @@
             <p>{{ analysis.actions.complaint_note }}</p>
           </article>
         {% endif %}
+      </section>
+
+      <section class="feedback-panel" id="feedback" aria-label="Outcome feedback">
+        <div class="panel-heading">
+          <p class="eyebrow">Calibration loop</p>
+          <h2>Record the outcome</h2>
+        </div>
+        <form action="/analyses/{{ analysis.id }}/feedback" method="post">
+          <label class="field" for="outcome">
+            <span>Outcome</span>
+            <select id="outcome" name="outcome">
+              <option value="won_discount">Won a discount</option>
+              <option value="vendor_justified">Vendor justified quote</option>
+              <option value="no_change">No change</option>
+              <option value="wrong">Finding was wrong</option>
+            </select>
+          </label>
+          <label class="field" for="negotiated_savings">
+            <span>Negotiated savings</span>
+            <input id="negotiated_savings" name="negotiated_savings" type="number" min="0" step="0.01" value="0">
+          </label>
+          <label class="field feedback-notes" for="notes">
+            <span>Notes</span>
+            <textarea id="notes" name="notes" rows="3" placeholder="What happened after you challenged the quote?"></textarea>
+          </label>
+          <button class="primary" type="submit" data-feedback-submit>Save outcome</button>
+        </form>
       </section>
     </main>
   </body>

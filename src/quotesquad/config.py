@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     cerebras_base_url: str = "https://api.cerebras.ai/v1"
     cerebras_model: str = "gemma-4-31b"
     nhtsa_base_url: str = "https://api.nhtsa.gov"
+    zippopotam_base_url: str = "https://api.zippopotam.us"
+    overpass_base_url: str = "https://overpass-api.de/api"
+    nominatim_base_url: str = "https://nominatim.openstreetmap.org"
     mitchell_api_key: SecretStr | None = None
     chilton_api_key: SecretStr | None = None
     ebay_api_key: SecretStr | None = None

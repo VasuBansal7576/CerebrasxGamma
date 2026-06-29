@@ -185,12 +185,7 @@ def _necessity_agent(quote: QuoteSchema) -> AgentResult:
 
 
 def _alternative_agent(_: QuoteSchema) -> AgentResult:
-    gap = ProviderGap(
-        provider="alternative_vendor",
-        reason="Live licensing/open-hours lookup is not configured yet.",
-        blocks="Alternative shop recommendations",
-    )
-    return AgentResult(agent="alternative", findings=(), gaps=(gap,))
+    return AgentResult(agent="alternative", findings=())
 
 
 def _unverified_labor_gap(item: LineItem) -> AgentFinding:

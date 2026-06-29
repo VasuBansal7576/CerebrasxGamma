@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal, InvalidOperation
 from typing import Annotated
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile, status
@@ -10,7 +11,8 @@ from quotesquad.config import get_settings
 from quotesquad.db import SessionDep
 from quotesquad.document import text_from_upload
 from quotesquad.pdf import render_pdf
-from quotesquad.repository import calibration, get_analysis, vendor_intelligence
+from quotesquad.repository import calibration, get_analysis, save_feedback, vendor_intelligence
+from quotesquad.schemas import FeedbackOutcome, FeedbackRequest, MoneyModel
 from quotesquad.service import AnalysisInput, analyze_text
 
 router = APIRouter()
@@ -61,6 +63,42 @@ async def report(request: Request, analysis_id: str, session: SessionDep) -> HTM
     if analysis is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found")
     return templates.TemplateResponse(request, "report.html", {"analysis": analysis})
+
+
+@router.post("/analyses/{analysis_id}/feedback")
+async def feedback_form(
+    analysis_id: str,
+    session: SessionDep,
+    outcome: Annotated[FeedbackOutcome, Form()],
+    negotiated_savings: Annotated[str, Form()] = "0",
+    notes: Annotated[str, Form()] = "",
+) -> RedirectResponse:
+    try:
+        savings = Decimal(negotiated_savings or "0")
+    except InvalidOperation:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Negotiated savings must be a dollar amount.",
+        ) from None
+    if savings < Decimal("0"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Negotiated savings cannot be negative.",
+        )
+    feedback = await save_feedback(
+        session,
+        analysis_id,
+        FeedbackRequest(
+            outcome=outcome,
+            negotiated_savings=MoneyModel(amount=savings),
+            notes=notes or None,
+        ),
+    )
+    if feedback is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found")
+    return RedirectResponse(
+        f"/analyses/{analysis_id}#feedback", status_code=status.HTTP_303_SEE_OTHER
+    )
 
 
 @router.get("/enterprise", response_class=HTMLResponse)

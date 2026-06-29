@@ -45,7 +45,8 @@ SQLAlchemy async database
 | `src/quotesquad/document.py` | Upload extraction for text, PDF, image OCR fallback, and extraction gaps. |
 | `src/quotesquad/pii.py` | PII redaction before extraction and analysis. |
 | `src/quotesquad/agents.py` | Deterministic labor, parts, contractor, necessity, and alternatives agents. |
-| `src/quotesquad/public_data.py` | No-key NHTSA recall/complaint enrichment plus eBay public-web agent orchestration. |
+| `src/quotesquad/public_data.py` | No-key NHTSA recall/complaint enrichment, eBay public-web checks, and public alternative-vendor orchestration. |
+| `src/quotesquad/vendor_directory.py` | Zippopotam ZIP geocoding plus Overpass and bounded Nominatim OpenStreetMap vendor lookup. |
 | `src/quotesquad/market_web.py` | Best-effort public eBay price parsing with explicit blocked-state gaps. |
 | `src/quotesquad/verification.py` | Confidence gate and conflict extraction. |
 | `src/quotesquad/synthesis.py` | Deterministic synthesis plus optional Cerebras JSON synthesis when configured. |
@@ -60,7 +61,7 @@ SQLAlchemy async database
 3. The input is redacted by `pii.py`.
 4. `service.py` extracts a `QuoteSchema`, including line items, totals, zip code, and vehicle hints when present.
 5. Deterministic agents inspect line items for labor, parts, contractor, necessity, and alternative recommendation issues.
-6. Public-data agents add NHTSA recall/complaint findings for detected vehicles and best-effort eBay public-web parts pricing. Blocked public web returns a provider gap.
+6. Public-data agents add NHTSA recall/complaint findings for detected vehicles, best-effort eBay public-web parts pricing, and OpenStreetMap alternative-vendor candidates. Blocked public web returns a provider gap.
 7. `verification.py` keeps confidence, conflict, and source quality visible.
 8. `synthesis.py` creates a deterministic summary. If `QUOTESQUAD_CEREBRAS_API_KEY` exists, Cerebras can replace the summary and negotiation notes while staying grounded in structured findings.
 9. `repository.py` stores the full `AnalysisRead` JSON result and optional feedback/calibration rows.
@@ -84,6 +85,7 @@ SQLite is the default for local development and demos. Production deployments sh
 | Cerebras | Optional live synthesis. Missing key or failures fall back to deterministic synthesis with a provider gap. |
 | NHTSA | No-key public recall and complaint lookups for detected vehicle quotes. |
 | eBay public web | Best-effort public price parsing. Blocked/captcha/parse failures are returned as gaps. |
+| OpenStreetMap | No-key nearby alternative-vendor candidates through ZIP geocoding, Overpass directory search, and bounded Nominatim fallback. |
 | Tesseract | Optional local OCR for image uploads. No cloud OCR key required. |
 | Mitchell, Chilton, RSMeans, Home Depot, Yelp, BBB | Readiness placeholders only. The app does not fake these integrations. |
 
@@ -117,7 +119,7 @@ TMPDIR=$PWD/data uv run basedpyright
 TMPDIR=$PWD/data uv run pytest -q
 ```
 
-The test suite covers the deterministic pipeline, feedback/calibration behavior, provider readiness, NHTSA-style public data, eBay blocked-state handling, and Cerebras response-shape tolerance.
+The test suite covers the deterministic pipeline, feedback/calibration behavior, provider readiness, NHTSA-style public data, OpenStreetMap alternative candidates, eBay blocked-state handling, and Cerebras response-shape tolerance.
 
 ## Known Product Gaps
 
@@ -125,6 +127,6 @@ These are intentionally not papered over:
 
 - Reliable live parts pricing still needs an official provider or stable ingestion path.
 - Paid repair and contractor catalogs are not integrated without credentials.
-- Alternative vendor recommendations are currently heuristic/readiness-level, not a full marketplace/ranking system.
+- Alternative vendor recommendations use public-directory candidates only; licensing, ratings, and open-hours verification still need a richer provider.
 - Cloud infrastructure is deployable but not provisioned in this repo.
 - Mobile app, browser extension, SOC 2, HIPAA, and legal certification are not implemented by code alone.

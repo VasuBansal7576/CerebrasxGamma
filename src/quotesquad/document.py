@@ -189,6 +189,8 @@ def _last_amount(line: str) -> Decimal | None:
 def _last_amount_span(line: str) -> tuple[Decimal, int, int] | None:
     last_match: re.Match[str] | None = None
     for match in PRICE_RE.finditer(line):
+        if not _looks_like_price(match):
+            continue
         last_match = match
     if last_match is None:
         return None
@@ -201,6 +203,12 @@ def _last_amount_span(line: str) -> tuple[Decimal, int, int] | None:
     except InvalidOperation:
         return None
     return amount, last_match.start(), last_match.end()
+
+
+def _looks_like_price(match: re.Match[str]) -> bool:
+    token = match.group(0)
+    amount_text = match.group(1)
+    return "$" in token or "." in amount_text or "," in amount_text
 
 
 def _hours(line: str) -> Decimal | None:

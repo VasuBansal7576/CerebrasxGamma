@@ -58,6 +58,16 @@ def provider_readiness(settings: Settings) -> ProviderReadiness:
         _secret_provider("rsmeans", settings.rsmeans_api_key, "Contractor benchmark lookup."),
         _secret_provider("home_depot", settings.home_depot_api_key, "Contractor materials lookup."),
         _secret_provider("yelp", settings.yelp_api_key, "Alternative provider verification."),
+        ReadinessItem(
+            name="openstreetmap",
+            status="live",
+            evidence=(
+                f"{settings.zippopotam_base_url} ZIP geocoding plus "
+                f"{settings.overpass_base_url} and {settings.nominatim_base_url} "
+                "public directory lookups."
+            ),
+            blocks="Licensing, ratings, and open-hours verification still require a richer provider.",
+        ),
         _secret_provider("bbb", settings.bbb_api_key, "Complaint-history checks."),
         _feed_provider(
             "regulatory", settings.regulatory_feed_url, "State legal citation freshness."

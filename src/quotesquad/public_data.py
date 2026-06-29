@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from quotesquad.confidence import confidence_status
 from quotesquad.config import Settings
 from quotesquad.http_client import create_async_client
+from quotesquad.local_vendors import alternative_vendor_agent
 from quotesquad.market_web import ebay_public_agent
 from quotesquad.schemas import (
     AgentFinding,
@@ -59,9 +60,12 @@ class NhtsaData:
 
 
 async def run_public_agents(quote: QuoteSchema, settings: Settings) -> tuple[AgentResult, ...]:
+    if settings.app_env == "test":
+        return ()
     ebay_result = await ebay_public_agent(quote)
+    alternative_result = await alternative_vendor_agent(quote, settings)
     if quote.vehicle_year is None or quote.vehicle_make is None or quote.vehicle_model is None:
-        return (ebay_result,)
+        return (ebay_result, alternative_result)
     try:
         data = await _fetch_nhtsa(quote, settings)
     except (httpx2.HTTPError, ValidationError):
@@ -78,8 +82,9 @@ async def run_public_agents(quote: QuoteSchema, settings: Settings) -> tuple[Age
                     ),
                 ),
             ),
+            alternative_result,
         )
-    return (ebay_result, nhtsa_agent_result(quote, data))
+    return (ebay_result, nhtsa_agent_result(quote, data), alternative_result)
 
 
 def nhtsa_agent_result(quote: QuoteSchema, data: NhtsaData) -> AgentResult:

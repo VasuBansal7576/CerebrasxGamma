@@ -107,6 +107,33 @@ All spacing derives from a base of 4px.
 - **Accessibility**: labels above inputs, errors below fields.
 - **Motion**: submit button active translate only.
 
+### Workbench Panel
+
+- **Structure**: panel heading, primary task content, secondary proof or metadata rows.
+- **Variants**: intake, quote ledger, provider gap, feedback.
+- **Spacing**: --space-6 padding, --space-5 between panel header and content.
+- **States**: focus states live on child controls and links.
+- **Accessibility**: section labels through visible headings; no hidden-only status.
+- **Motion**: no decorative load sequence.
+
+### Status Dot
+
+- **Structure**: 10px semantic dot plus visible heading/copy.
+- **Variants**: live, caveat, gap.
+- **Spacing**: --space-3 gap between dot and text.
+- **States**: static; never color-only because adjacent text names the status.
+- **Accessibility**: status meaning must be repeated in copy.
+- **Motion**: none.
+
+### Evidence List
+
+- **Structure**: status row, title, finding copy, optional money row, citation row.
+- **Variants**: verified, caveated, unverified, suppressed omitted from primary output.
+- **Spacing**: --space-5 panel padding, --space-3 internal gap.
+- **States**: citation focus outlines; full panel border color reflects status.
+- **Accessibility**: confidence is text, not color-only.
+- **Motion**: opacity/translate only if a future reveal is added.
+
 ## 6. Motion & Interaction
 
 ### Timing

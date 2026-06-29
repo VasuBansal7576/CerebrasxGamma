@@ -6,38 +6,66 @@
     <meta name="description" content="QuoteSquad audits professional quotes with citations and confidence gates.">
     <title>QuoteSquad</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/forms.css">
+    <link rel="stylesheet" href="/static/workbench.css">
+    <link rel="stylesheet" href="/static/responsive.css">
     <script defer src="/static/app.js"></script>
   </head>
   <body>
+    <a class="skip-link" href="#content">Skip to quote audit</a>
     <header class="topbar">
-      <a class="brand" href="/">QuoteSquad</a>
+      <a class="brand" href="/" aria-label="QuoteSquad home">
+        <span class="brand-mark" aria-hidden="true">QS</span>
+        <span>QuoteSquad</span>
+      </a>
       <nav aria-label="Primary">
         <a href="/enterprise">Enterprise</a>
-        <a href="/api/health">API health</a>
+        <a href="/api/providers/status">Providers</a>
       </nav>
     </header>
-    <main class="shell">
-      <section class="hero">
-        <div>
-          <p class="overline">Citation-grounded quote audits</p>
-          <h1>Know what to challenge before you approve the quote.</h1>
-          <p class="lead">Paste an estimate and get sourced findings, confidence gates, and negotiation artifacts.</p>
+    <main class="shell" id="content">
+      <section class="workspace">
+        <div class="brief-panel">
+          <p class="eyebrow">Quote intelligence workbench</p>
+          <h1>Audit the estimate before you approve it.</h1>
+          <p class="lead">Paste a quote, upload a document, or load the sample. QuoteSquad returns line-item findings with confidence, citations, gaps, and negotiation copy.</p>
+          <dl class="proof-list">
+            <div>
+              <dt>Evidence rule</dt>
+              <dd>No source, no confident savings claim.</dd>
+            </div>
+            <div>
+              <dt>Live public data</dt>
+              <dd>NHTSA recalls, public eBay pages, and OpenStreetMap directory candidates.</dd>
+            </div>
+            <div>
+              <dt>Private providers</dt>
+              <dd>Mitchell, Chilton, RSMeans, Yelp, BBB, and Home Depot stay visible as readiness gaps until configured.</dd>
+            </div>
+          </dl>
         </div>
-        <form class="upload-panel" action="/analyze" method="post" enctype="multipart/form-data">
+
+        <form class="intake-panel" action="/analyze" method="post" enctype="multipart/form-data">
           {% if error %}
             <p class="error" role="alert">{{ error }}</p>
           {% endif %}
-          <label for="quote_text">Quote text</label>
-          <textarea id="quote_text" name="quote_text" rows="12" placeholder="Paste line items, totals, vendor name, and ZIP context"></textarea>
+          <div class="panel-heading">
+            <p class="eyebrow">New audit</p>
+            <h2>Quote intake</h2>
+          </div>
+          <label class="field" for="quote_text">
+            <span>Quote text</span>
+            <textarea id="quote_text" name="quote_text" rows="13" placeholder="Paste vendor name, line items, totals, vehicle details, and ZIP context"></textarea>
+          </label>
           <div class="field-grid">
-            <div>
-              <label for="zip_code">ZIP code</label>
+            <label class="field" for="zip_code">
+              <span>ZIP code</span>
               <input id="zip_code" name="zip_code" inputmode="numeric" autocomplete="postal-code" placeholder="90210">
-            </div>
-            <div>
-              <label for="upload">Upload PDF or text</label>
+            </label>
+            <label class="field" for="upload">
+              <span>Upload PDF, text, or image</span>
               <input id="upload" name="upload" type="file" accept=".pdf,.txt,.csv,.md,.jpg,.jpeg,.png,.heic,.webp">
-            </div>
+            </label>
           </div>
           <label class="check-row" for="consent_to_learn">
             <input id="consent_to_learn" name="consent_to_learn" type="checkbox" value="true">
@@ -49,19 +77,29 @@
           </div>
         </form>
       </section>
-      <section class="trust-strip" aria-label="Trust rules">
-        <div>
-          <strong>No raw document storage</strong>
-          <span>PII is scrubbed before extraction.</span>
-        </div>
-        <div>
-          <strong>Confidence gates</strong>
-          <span>Low-confidence claims stay out of the script.</span>
-        </div>
-        <div>
-          <strong>Citation trail</strong>
-          <span>Every finding shows its source or its gap.</span>
-        </div>
+
+      <section class="ops-strip" aria-label="Audit guarantees">
+        <article>
+          <span class="status-dot status-live"></span>
+          <div>
+            <h2>Local-first processing</h2>
+            <p>Raw uploads are processed in memory. Persisted results store scrubbed structured output.</p>
+          </div>
+        </article>
+        <article>
+          <span class="status-dot status-caveat"></span>
+          <div>
+            <h2>Confidence gated</h2>
+            <p>Findings under the threshold stay out of the challenge script.</p>
+          </div>
+        </article>
+        <article>
+          <span class="status-dot status-gap"></span>
+          <div>
+            <h2>Gaps are visible</h2>
+            <p>Blocked providers, missing ZIPs, and weak evidence are shown as product output.</p>
+          </div>
+        </article>
       </section>
     </main>
   </body>

@@ -1,0 +1,80 @@
+.field,
+.intake-panel {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.field span,
+.check-row {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 680;
+}
+
+input,
+select,
+textarea {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  color: var(--text-primary);
+  min-height: 44px;
+  padding: var(--space-3);
+  width: 100%;
+}
+
+textarea {
+  line-height: 1.5;
+  resize: vertical;
+}
+
+::placeholder {
+  color: color-mix(in srgb, var(--text-secondary), var(--text-primary) 18%);
+  opacity: 1;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-primary), transparent 72%);
+  outline-offset: 2px;
+}
+
+.field-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+}
+
+.check-row {
+  align-items: start;
+  display: flex;
+  font-weight: 500;
+  gap: var(--space-3);
+}
+
+.check-row input {
+  min-height: 18px;
+  width: 18px;
+}
+
+.form-actions,
+.feedback-panel form {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.form-actions {
+  justify-content: flex-end;
+}
+
+.feedback-panel form {
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.feedback-notes {
+  flex: 1 1 320px;
+}

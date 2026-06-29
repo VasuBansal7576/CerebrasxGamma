@@ -1,0 +1,181 @@
+.report-shell {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.report-summary {
+  align-items: start;
+  display: grid;
+  gap: var(--space-8);
+  grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
+}
+
+.metric-panel {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: var(--space-5);
+}
+
+.metric-panel strong,
+.ledger-grid strong,
+.line-item em,
+.money-row dd {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-style: normal;
+  font-weight: 760;
+}
+
+.metric-panel strong {
+  display: block;
+  font-size: 26px;
+  margin-top: var(--space-2);
+}
+
+.ledger-grid {
+  border-bottom: 1px solid var(--border-subtle);
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-bottom: var(--space-5);
+}
+
+.ledger-grid span,
+.metric-panel span,
+.line-item span,
+.finding-topline,
+small {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ledger-grid strong {
+  display: block;
+  margin-top: var(--space-1);
+}
+
+.line-items,
+.gap-list,
+.evidence-list {
+  display: grid;
+}
+
+.gap-list,
+.evidence-list {
+  gap: var(--space-4);
+}
+
+.line-item {
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 92px minmax(0, 1fr) auto;
+  padding: var(--space-3) 0;
+}
+
+.line-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.gap-list article {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: var(--space-4);
+}
+
+.gap-list p {
+  margin: var(--space-2) 0;
+}
+
+.finding,
+.actions-grid article,
+.empty-panel {
+  padding: var(--space-5);
+}
+
+.finding {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.finding-verified {
+  border-color: color-mix(in srgb, var(--status-success), var(--border-default) 58%);
+}
+
+.finding-caveated {
+  border-color: color-mix(in srgb, var(--status-warning), var(--border-default) 58%);
+}
+
+.finding-unverified {
+  border-color: color-mix(in srgb, var(--status-info), var(--border-default) 58%);
+}
+
+.finding-topline {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  text-transform: uppercase;
+}
+
+.finding h2,
+.finding p,
+.actions-grid p,
+.actions-grid pre,
+.empty-panel p {
+  margin: 0;
+}
+
+.money-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-2) 0;
+}
+
+.money-row div {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  min-width: 128px;
+  padding: var(--space-3);
+}
+
+.money-row dt {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.money-row dd {
+  margin: var(--space-1) 0 0;
+}
+
+.citations,
+.actions-grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.citations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.citations a {
+  font-size: 14px;
+  font-weight: 680;
+}
+
+.actions-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.actions-grid pre {
+  font-family: inherit;
+  white-space: pre-wrap;
+}

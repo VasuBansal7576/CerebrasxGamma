@@ -6,25 +6,36 @@
     <meta name="description" content="QuoteSquad enterprise intelligence view.">
     <title>QuoteSquad Enterprise</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/report.css">
+    <link rel="stylesheet" href="/static/responsive.css">
   </head>
   <body>
+    <a class="skip-link" href="#content">Skip to enterprise intelligence</a>
     <header class="topbar">
-      <a class="brand" href="/">QuoteSquad</a>
+      <a class="brand" href="/" aria-label="QuoteSquad home">
+        <span class="brand-mark" aria-hidden="true">QS</span>
+        <span>QuoteSquad</span>
+      </a>
       <nav aria-label="Enterprise actions">
         <a href="/api/enterprise/fleet/summary">Fleet API</a>
       </nav>
     </header>
-    <main class="shell report-shell">
-      <section class="report-hero">
+    <main class="shell report-shell" id="content">
+      <section class="report-summary">
         <div>
-          <p class="overline">Enterprise intelligence</p>
+          <p class="eyebrow">Enterprise intelligence</p>
           <h1>Fleet and vendor risk, built from sourced audits.</h1>
-          <p class="lead">Use this page to verify phase 3 and phase 4 surfaces without external credentials.</p>
+          <p class="lead">Use this page to inspect the feedback loop, vendor flags, and calibration data produced by real analyses.</p>
         </div>
-        <div class="score-panel">
-          <span>Tracked vendors</span>
-          <strong>{{ vendors | length }}</strong>
-          <small>{{ calibration_rows | length }} calibrated categories</small>
+        <div class="metric-panel" aria-label="Enterprise summary">
+          <div>
+            <span>Tracked vendors</span>
+            <strong>{{ vendors | length }}</strong>
+          </div>
+          <div>
+            <span>Calibrated categories</span>
+            <strong>{{ calibration_rows | length }}</strong>
+          </div>
         </div>
       </section>
 
