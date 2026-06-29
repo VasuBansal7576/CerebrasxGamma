@@ -107,7 +107,7 @@ The repository includes:
 - `Makefile` commands for dev and verification.
 - `pyproject.toml` and `uv.lock` for reproducible Python dependencies.
 
-Production should add managed Postgres, Redis or workflow infrastructure if needed, object storage for durable uploads/reports, OpenTelemetry export, a secrets manager, and provider credentials. The app exposes `/api/infra/readiness` and `/api/providers/status` so those gaps are inspectable.
+Production should add managed Postgres, Redis or workflow infrastructure if needed, object storage for durable uploads/reports, OpenTelemetry export, a secrets manager, and provider credentials. Admin readiness endpoints (`/api/infra/readiness` and `/api/providers/status`) require `X-QuoteSquad-Key` and are not linked from the public workflow.
 
 ## Verification
 

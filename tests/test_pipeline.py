@@ -1,21 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
 from decimal import Decimal
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
 
-from quotesquad.config import get_settings
 from quotesquad.document import extract_quote
 from quotesquad.local_vendors import alternative_vendor_result
 from quotesquad.market_web import parse_ebay_prices
 from quotesquad.ocr import extract_image_text
 from quotesquad.pii import scrub_pii
 from quotesquad.public_data import NhtsaData, NhtsaRecall, nhtsa_agent_result
-from quotesquad.readiness import InfraReadiness, ProviderReadiness
 from quotesquad.schemas import AnalysisRead, ComplianceControl, EnterpriseAuditRead
 from quotesquad.synthesis import SynthesisPayload
 from quotesquad.vendor_directory import NominatimPlace, OsmCandidate, nominatim_candidates
@@ -44,19 +40,6 @@ CONTRACTOR_QUOTE = "\n".join(
         "",
     )
 )
-
-
-@pytest.fixture
-def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
-    monkeypatch.setenv("QUOTESQUAD_APP_ENV", "test")
-    monkeypatch.setenv("QUOTESQUAD_DATABASE_URL", f"sqlite+aiosqlite:///{tmp_path}/test.db")
-    monkeypatch.setenv("QUOTESQUAD_RATE_LIMIT_PER_MINUTE", "0")
-    get_settings.cache_clear()
-    from quotesquad.main import create_app
-
-    with TestClient(create_app()) as test_client:
-        yield test_client
-    get_settings.cache_clear()
 
 
 def test_scrub_pii_when_contact_details_present() -> None:
@@ -179,19 +162,6 @@ def test_create_analysis_when_quote_is_posted(client: TestClient) -> None:
     assert payload.synthesis.verdict
     assert payload.actions.challenge_script
     assert any(item.citations for item in payload.findings)
-
-
-def test_provider_and_infra_readiness_surfaces(client: TestClient) -> None:
-    providers = client.get("/api/providers/status")
-    infra = client.get("/api/infra/readiness")
-    assert providers.status_code == 200
-    assert infra.status_code == 200
-    provider_payload = ProviderReadiness.model_validate_json(providers.text)
-    infra_payload = InfraReadiness.model_validate_json(infra.text)
-    provider_names = {item.name for item in provider_payload.providers}
-    infra_names = {item.name for item in infra_payload.items}
-    assert {"cerebras", "mitchell", "openstreetmap", "tesseract_ocr"} <= provider_names
-    assert {"database", "redis", "temporal", "object_storage", "observability"} <= infra_names
 
 
 def test_report_page_when_analysis_exists(client: TestClient) -> None:

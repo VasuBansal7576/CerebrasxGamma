@@ -78,8 +78,8 @@ curl http://localhost:8000/api/vendors/intelligence
 curl http://localhost:8000/api/compliance/controls
 
 # Production readiness handoff
-curl http://localhost:8000/api/providers/status
-curl http://localhost:8000/api/infra/readiness
+curl http://localhost:8000/api/providers/status -H 'x-quotesquad-key: <admin-key>'
+curl http://localhost:8000/api/infra/readiness -H 'x-quotesquad-key: <admin-key>'
 ```
 
 ## Credentials
@@ -87,6 +87,7 @@ curl http://localhost:8000/api/infra/readiness
 Add Cerebras after the build:
 
 ```env
+QUOTESQUAD_API_KEY=replace-with-admin-key
 QUOTESQUAD_CEREBRAS_API_KEY=...
 QUOTESQUAD_CEREBRAS_MODEL=gemma-4-31b
 QUOTESQUAD_NHTSA_BASE_URL=https://api.nhtsa.gov

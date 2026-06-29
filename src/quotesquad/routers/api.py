@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from quotesquad.auth import require_api_key
+from quotesquad.auth import require_admin_api_key, require_api_key
 from quotesquad.config import Settings, get_settings
 from quotesquad.db import SessionDep
 from quotesquad.readiness import (
@@ -53,12 +53,20 @@ async def health(settings: SettingsDep) -> dict[str, str]:
     return {"status": "ok", "cerebras": llm}
 
 
-@router.get("/providers/status", response_model=ProviderReadiness)
+@router.get(
+    "/providers/status",
+    response_model=ProviderReadiness,
+    dependencies=[Depends(require_admin_api_key)],
+)
 async def providers_status(settings: SettingsDep) -> ProviderReadiness:
     return provider_readiness(settings)
 
 
-@router.get("/infra/readiness", response_model=InfraReadiness)
+@router.get(
+    "/infra/readiness",
+    response_model=InfraReadiness,
+    dependencies=[Depends(require_admin_api_key)],
+)
 async def read_infra_readiness(settings: SettingsDep) -> InfraReadiness:
     return infra_readiness(settings)
 
