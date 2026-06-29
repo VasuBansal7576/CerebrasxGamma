@@ -2,7 +2,14 @@
 
 Production core for the architecture in `Architecture.md`: upload or paste a quote, get a structured confidence-scored audit, citations, negotiation scripts, and a downloadable report.
 
-## What is implemented
+## Docs
+
+- `SYSTEM_DESIGN.md`: implemented system design, request lifecycle, module map, provider boundaries.
+- `Architecture.md`: original product architecture and phased ambition.
+- `DESIGN.md`: visual design system for the web experience.
+- `.env.example`: supported local and production configuration keys.
+
+## What is implemented now
 
 - FastAPI web app and JSON API.
 - PII scrub before extraction.
@@ -18,6 +25,12 @@ Production core for the architecture in `Architecture.md`: upload or paste a quo
 - Feedback loop, outcome calibration, regional pricing observations, contractor quote support.
 - Enterprise audit API, fleet/vendor intelligence, white-label config, compliance controls, deletion.
 - Provider and infrastructure readiness APIs for credential and production-rollout handoff.
+
+## What is intentionally not faked
+
+- Mitchell, Chilton, RSMeans, Home Depot, Yelp, and BBB are readiness placeholders until real credentials or a legal public-data path exists.
+- eBay public-web pricing is best-effort and reports a gap when blocked.
+- Cloud services, SOC 2, HIPAA, mobile, and browser extension work are not represented as complete unless provisioned separately.
 
 ## Run locally
 
@@ -98,3 +111,5 @@ Until then the app keeps working locally, uses deterministic fallbacks where saf
 ```bash
 make check
 ```
+
+For the full implementation map, read `SYSTEM_DESIGN.md`.
